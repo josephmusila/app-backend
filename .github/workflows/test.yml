@@ -16,7 +16,7 @@ jobs:
     DB_PASSWORD: "Musila@01"
     DB_HOST: localhost
     DB_DATABASE: 'kyeni'
-    DB_PORT: 3306
+    DB_PORT: "3306"
   simple_build:
     runs-on: ubuntu-latest
     steps:
