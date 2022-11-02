@@ -9,6 +9,14 @@ on:
         branches: [main]
 
 jobs:
+
+    DEBUG: "0"
+    DJANGO_SECRET_KEY: 'django-insecure-q&3i7&o#*^eihe%@x3oq$dx*s#bv=na$q=omodk$$%n5#l*f6i'
+    DB_USERNAME: "admin"
+    DB_PASSWORD: "Musila@01"
+    DB_HOST: localhost
+    DB_DATABASE: 'kyeni'
+    DB_PORT: 3306
   simple_build:
     runs-on: ubuntu-latest
     steps:
