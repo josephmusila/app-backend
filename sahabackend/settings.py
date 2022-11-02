@@ -79,13 +79,20 @@ WSGI_APPLICATION = 'sahabackend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'kyeni',
+#         'HOST': 'localhost',
+#         'USER': 'admin',
+#         'PASSWORD':'Musila@01'
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'kyeni',
-        'HOST': 'localhost',
-        'USER': 'admin',
-        'PASSWORD':'Musila@01'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
