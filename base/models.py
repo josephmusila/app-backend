@@ -82,22 +82,22 @@ class Student(models.Model):
     
     id = models.AutoField(primary_key=True)
     
-    firstname = models.CharField(max_length=50,blank=False)
-    otherme = models.CharField(max_length=50,blank=False)
-    surname= models.CharField(max_length=50,blank=True)
-    idnumber = models.IntegerField(unique=True,blank=True)
-    dateOfBirth = models.DateField()
-    password=models.IntegerField(default=12345678)
-    email = models.EmailField(unique=True)
-    residence = models.CharField(max_length=50)
-    religion = models.CharField(max_length=50,default="Christian")
-    gender = models.CharField(max_length=1,choices=GENDER_CHOICES,default=OTHER)
-    avatar=models.ImageField(null=True,upload_to="student_avatars")
-    faculty=models.ForeignKey(Faculty,on_delete=models.DO_NOTHING)
-    school=models.ForeignKey(School,on_delete=models.DO_NOTHING)
-    department=models.ForeignKey(Department,on_delete=models.DO_NOTHING)
-    course=models.ForeignKey(Course,on_delete=models.DO_NOTHING)
-    regNumber = models.SlugField(blank=True,null=True,unique=True)
+    firstname = models.CharField(max_length=50,blank=True,null=True)
+    otherme = models.CharField(max_length=50,blank=True,null=True)
+    surname= models.CharField(max_length=50,blank=True,null=True)
+    idnumber = models.IntegerField(unique=True,blank=True,null=True)
+    dateOfBirth = models.DateField(blank=True,null=True)
+    password=models.IntegerField(default=12345678,blank=True,null=True)
+    email = models.EmailField(unique=True,blank=True,null=True)
+    residence = models.CharField(max_length=50,blank=True,null=True)
+    religion = models.CharField(max_length=50,default="Christian",blank=True,null=True)
+    gender = models.CharField(max_length=1,choices=GENDER_CHOICES,default=OTHER,blank=True,null=True)
+    avatar=models.ImageField(upload_to="student_avatars",blank=True,null=True)
+    faculty=models.ForeignKey(Faculty,on_delete=models.DO_NOTHING,blank=True,null=True)
+    school=models.ForeignKey(School,on_delete=models.DO_NOTHING,blank=True,null=True)
+    department=models.ForeignKey(Department,on_delete=models.DO_NOTHING,blank=True,null=True)
+    course=models.ForeignKey(Course,on_delete=models.DO_NOTHING,blank=True,null=True)
+    regNumber = models.SlugField(blank=True,null=True)
  
     def save(self, *args, **kwargs):
         # if self.department.departmentName == "IT":
@@ -245,7 +245,7 @@ class Book(models.Model):
     bookSerialNumber=models.CharField(max_length=20)
     publisher=models.CharField(max_length=50)
     author=models.CharField(max_length=100)
-    yearOfPublish=models.DateField()
+    yearOfPublish=models.DateField(blank=True,null=True)
 
 
 class Library(models.Model):

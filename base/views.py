@@ -34,6 +34,10 @@ def getStudent(request,pk):
 
 
 
+@api_view(["GET"])
+
+
+
 # @api_view(["GET","POST"])
 # def user_api(request,search):
 #     queryset=User.objects.all()

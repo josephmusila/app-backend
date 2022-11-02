@@ -19,3 +19,7 @@ class StudentSerializer(serializers.ModelSerializer):
 
     def student_name(self,student:Student):
         return f'{student.firstname} {student.otherme} {student.surname}'
+
+
+class  TimetableSerializer(serializers.ModelSerializer):
+    fields="__all__"                                             
