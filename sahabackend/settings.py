@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'super_inlines'
+    'super_inlines',
     'rest_framework',
     'django.contrib.staticfiles',
     'corsheaders',
