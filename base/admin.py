@@ -3,55 +3,35 @@ from django.contrib import admin
 from django.contrib.admin import TabularInline, StackedInline, site
 from super_inlines.admin import SuperInlineModelAdmin, SuperModelAdmin
 
-from base.models import Course, Department, Faculty, Fees, Lecturer, School, Student, SupportStaff, TimeTableEntity, Timetable, TimetableDay, Units
-
+from . import models
 # Register your models here.
 
-@admin.register(Student)
+@admin.register(models.Student) 
 class StudentAdmin(admin.ModelAdmin):
-    list_display=['firstname','surname','course','department','regNumber','school','faculty']
-    readonly_fields = ('regNumber','department','school','faculty','password',)
+    list_display=['firstname','surname','course','regNumber',]
+    readonly_fields = ('regNumber','password',)
 
 
-@admin.register(School)
-class SchoolAdmin(admin.ModelAdmin):
-    list_display=['schoolName','faculty']
 
-@admin.register(Faculty)
-class FacultyAdmin(admin.ModelAdmin):
-    list_display=['facultyName']
-
-@admin.register(Department)
-class DepartmentAdmin(admin.ModelAdmin):
-    list_display=['departmentName','school']
-
-@admin.register(Course)
+@admin.register(models.Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display=['courseName','department','yearOfStudy','numberOfStudents']
+    list_display=['courseName','yearOfStudy','numberOfStudents']
 
 
 
-@admin.register(Units)
+@admin.register(models.Units)
 class UnitAdmin(admin.ModelAdmin):
     list_display=['unitName','unitCode',]
 
-class TimeTableDayAdmin(SuperInlineModelAdmin, TabularInline):
-    model=TimeTableEntity
-    extra=1
 
-
-class TimetableInlineAdmin(SuperInlineModelAdmin, StackedInline):
-    model=TimetableDay
-    inlines=(TimeTableDayAdmin,)
-    
-    extra=1
     
 
 
-@admin.register(Timetable)
+@admin.register(models.Timetable)
 class TimeTableAdmin(SuperModelAdmin):
-    inlines=(TimetableInlineAdmin,)
-    list_display=['course','year_of_study','department']
+    # inlines=(TimetableInlineAdmin,)
+    model=models.Timetable
+    list_display=['course','year_of_study']
 
 
     def year_of_study(self,timetable):
@@ -62,17 +42,26 @@ class TimeTableAdmin(SuperModelAdmin):
 
 
 
-@admin.register(Lecturer)
+@admin.register(models.Lecturer)
 class LectureAdmin(admin.ModelAdmin):
    
-    list_display=['firstname','surname','department']
+    list_display=['firstname','surname']
 
 
-@admin.register(SupportStaff)
+@admin.register(models.SupportStaff)
 class SupportStaffAdmin(admin.ModelAdmin):
     list_display=['firstname']
 
-@admin.register(Fees)
+@admin.register(models.Fees)
 class FeeAdmin(admin.ModelAdmin):
     list_display=['paymentCode','amount','cashier','student','paymentMethod']
     readonly_fields=('paymentCode',)
+
+@admin.register(models.CustomExams)
+class CustomExamAdmin(admin.ModelAdmin):
+    list_display=["unit","student"]
+
+
+admin.site.register(models.CourseExams)
+admin.site.register(models.UnitMarks)
+# admin.site.register(models.CustomExams)

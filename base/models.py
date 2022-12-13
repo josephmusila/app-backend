@@ -1,5 +1,6 @@
 from calendar import TUESDAY, WEDNESDAY
 from dataclasses import fields
+import datetime
 from distutils.command.upload import upload
 from sqlite3 import Date
 from django.db import models
@@ -13,34 +14,15 @@ from django.contrib.auth.models import AbstractUser
 class User(AbstractUser):
     email=models.EmailField(unique=True)
 
-class Faculty(models.Model):
-    
-    facultyName=models.CharField(max_length=200,null=False)
-    
-    def __str__(self):
-        return f'{self.facultyName}'
-
-class School(models.Model):
-    schoolName=models.CharField(max_length=200,null=False)
-    faculty=models.ForeignKey(Faculty,on_delete=models.DO_NOTHING,blank=True)
 
 
-    def __str__(self):
-        return f'{self.schoolName}'
-
-class Department(models.Model):
-    
-    departmentName=models.CharField(max_length=200,null=False)
-    school=models.ForeignKey(School,on_delete=models.DO_NOTHING)
 
 
-    def __str__(self):
-        return f'{self.departmentName}'
 
 class Course(models.Model):
     
     courseName=models.CharField(max_length=200)
-    department=models.ForeignKey(Department,on_delete=models.DO_NOTHING)
+    
     yearOfStudy=models.IntegerField()
     numberOfStudents=models.IntegerField()
     courseCode=models.CharField(max_length=5)
@@ -63,7 +45,7 @@ class Lecturer(models.Model):
     surname=models.CharField(max_length=50)
     idnumber=models.IntegerField(unique=True)
     dateOfBirth=models.DateField()
-    department=models.ForeignKey(Department,on_delete=models.DO_NOTHING)
+    course=models.ForeignKey(Course,on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return f'{self.firstname}'
@@ -93,18 +75,19 @@ class Student(models.Model):
     religion = models.CharField(max_length=50,default="Christian",blank=True,null=True)
     gender = models.CharField(max_length=1,choices=GENDER_CHOICES,default=OTHER,blank=True,null=True)
     avatar=models.ImageField(upload_to="student_avatars",blank=True,null=True)
-    faculty=models.ForeignKey(Faculty,on_delete=models.DO_NOTHING,blank=True,null=True)
-    school=models.ForeignKey(School,on_delete=models.DO_NOTHING,blank=True,null=True)
-    department=models.ForeignKey(Department,on_delete=models.DO_NOTHING,blank=True,null=True)
+    
     course=models.ForeignKey(Course,on_delete=models.DO_NOTHING,blank=True,null=True)
     regNumber = models.SlugField(blank=True,null=True)
+
+    def __str__(self) -> str:
+        return self.regNumber
  
     def save(self, *args, **kwargs):
         # if self.department.departmentName == "IT":
         # self.regNumber = f'{self.course.courseCode}/{self.id}/{date.today().year}'
-        self.department=self.course.department
-        self.school=self.course.department.school
-        self.faculty=self.course.department.school.faculty
+        # self.department=self.course.department
+        # self.school=self.course.department.school
+        # self.faculty=self.course.department.school.faculty
         self.password=self.idnumber
         super().save(*args, **kwargs)
 
@@ -121,14 +104,12 @@ post_save.connect(student_post_save,sender=Student)
 
 
 
- 
+
+
 
 
 class Timetable(models.Model):
-    course=models.ForeignKey(Course,on_delete=models.DO_NOTHING)
 
-
-class TimetableDay(models.Model):
     MONDAY="MONDAY"
     TUESDAY="TUESDAY"
     WEDNESDAY="WEDNESDAY"
@@ -141,14 +122,6 @@ class TimetableDay(models.Model):
         (THURSDAY,"THURSDAY"),
         (FRIDAY,"FRIDAY"),
     ]
-    day=models.CharField(max_length=10,choices=WEEKDAY_CHOICE,blank=False)
-    base=models.ForeignKey(Timetable,on_delete=models.DO_NOTHING)
- 
-
-
-
-class TimeTableEntity(models.Model):
-
 
 
     TIMESLOT_1="7:00-9:00"
@@ -165,16 +138,15 @@ class TimeTableEntity(models.Model):
         (TIMESLOT_5,"2:00-4:00"),
         (TIMESLOT_6,"4:00-6:00"),
     ]
-    entity=models.ForeignKey(Timetable,on_delete=models.DO_NOTHING)
-    
-   
-    unit=models.ForeignKey(Units,on_delete=models.DO_NOTHING)
-    lecturer=models.ForeignKey(Lecturer,on_delete=models.DO_NOTHING)
-    time=models.CharField(max_length=20,choices=TIMESLOT_CHOICE)
-    room=models.CharField(max_length=10)
-    entity=models.ForeignKey(TimetableDay,on_delete=models.DO_NOTHING)
 
-#support staff tables
+    course=models.ForeignKey(Course,on_delete=models.DO_NOTHING)
+    day=models.CharField(max_length=10,choices=WEEKDAY_CHOICE,blank=False)
+    unit=models.ForeignKey(Units,on_delete=models.DO_NOTHING  )
+    time=models.CharField(max_length=20,choices=TIMESLOT_CHOICE)
+    lecturer=models.ForeignKey(Lecturer,on_delete=models.DO_NOTHING)
+
+
+
 
 class StaffDepartment(models.Model):
 
@@ -288,9 +260,46 @@ post_save.connect(fee_post_save,sender=Fees)
 
 
 
-class Examinations(models.Model):
-    student=models.ForeignKey(Student,on_delete=models.DO_NOTHING)
-    unit = models.ForeignKey(Units,on_delete=models.DO_NOTHING)
-    marks=models.IntegerField(max_length=2)
 
+
+
+class CustomExams(models.Model):
+    student=models.ForeignKey(Student,on_delete=models.DO_NOTHING)
+    marks=models.IntegerField()
+    grade=models.CharField(max_length=1,blank=True,null=True)
+    unit=models.ForeignKey(Units,on_delete=models.DO_NOTHING)
+
+    def __str__(self) -> str:
+        return self.unit.unitName
+    
+
+def grade_post_save(sender,instance,created,*args,**kwargs):
+    if(instance.marks>70):
+        instance.grade="A"
+    else:
+        instance.grade="D" 
+
+    if created:
+        instance.save()
+
+post_save.connect(grade_post_save,sender=CustomExams)
+
+class UnitMarks(models.Model):
+    unit=models.ManyToManyField(CustomExams)
+    
+
+
+    # def __str__(self) -> str:
+    #     return self.unit
+
+
+
+class CourseExams(models.Model):
+    course=models.ForeignKey(Course,on_delete=models.DO_NOTHING)
+    examdate=models.DateField(auto_now_add=True)
+    semester=models.IntegerField()
+    units=models.ManyToManyField(UnitMarks)
+    
+    def __str__(self) -> str:
+        return self.course.courseName
     
